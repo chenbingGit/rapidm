@@ -28,11 +28,11 @@ public class HttpUtil {
 
     }
 
-    public String postForObject(String url, String parameter){
+    public String postForObject(String url, String xmlString){
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(parameter, headersXml);
+        HttpEntity<String> requestEntity = new HttpEntity<>(xmlString, headersXml);
         String result = restTemplate.postForObject(url,requestEntity,String.class);
-        logger.info("url <"+ url +"> 参数<" + parameter + "> 结果<"+ result +">");
+        logger.info("url <"+ url +"> 参数<" + xmlString + "> 结果<"+ result +">");
         return restTemplate.postForObject(url,requestEntity,String.class);
     }
 

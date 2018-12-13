@@ -15,10 +15,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -59,7 +61,9 @@ public class ConfigBean {
         HttpHeaders headersXml = new HttpHeaders();
         headersJson.setContentType(MediaType.TEXT_XML);
         headersJson.add("Accept", MediaType.APPLICATION_XML_VALUE);
-        return new HttpUtil(new RestTemplate(factory),headersForm,headersJson,headersXml);
+        RestTemplate  restTemplate =new RestTemplate(factory);
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return new HttpUtil(restTemplate ,headersForm,headersJson,headersXml);
     }
 
     @Bean

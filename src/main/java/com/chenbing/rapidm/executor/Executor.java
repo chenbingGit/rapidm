@@ -2,8 +2,9 @@ package com.chenbing.rapidm.executor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.chenbing.rapidm.config.HttpUtil;
-import com.chenbing.rapidm.util.WeChatMigrate;
 import com.chenbing.rapidm.dao.UserStatusDao;
+import com.chenbing.rapidm.util.WeChatMigrate;
+import com.chenbing.rapidm.util.menu.XYJFGWMenuManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,16 @@ public class Executor implements ApplicationRunner {
     @Autowired
     private UserStatusDao userStatusDao;
 
+    @Autowired
+    private XYJFGWMenuManager XYJFGWMenuManager;
+
 
     @Override
     public void run(ApplicationArguments applicationArguments){
 
-        logger.error(JSONObject.toJSONString(userStatusDao.get("")));
+        logger.error(JSONObject.toJSONString(userStatusDao.get("ozBTCt_6j-HbM3BzhqbP84-gg0go")));
 
+//        XYJFGWMenuManager.createMenu("16_xosM1K97yJFlckrvxDQ68fYfb5GQpEsQMRZtriBVxHODhiG_BD2N9PHYIeZ4caFIMCBIwmOg5ELKMV5ssjZXadiBdDDOLCg5fMssb_79iS2lRjVyyCLyHXRFukVc-L_SBemuvDnTqZwYNx5gZDOaAGADHS","prexyr.591jq.cn","wxd41629b093ac774a");
     }
 
 }
