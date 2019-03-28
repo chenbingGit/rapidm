@@ -1,6 +1,6 @@
 package com.chenbing.rapidm.dao;
 
-import com.eqianzhuang.efinancial.entity.UserStatusEntity;
+import com.eqianzhuang.insurance.entity.UserStatusEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Repository;

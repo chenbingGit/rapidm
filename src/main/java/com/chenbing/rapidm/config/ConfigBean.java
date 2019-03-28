@@ -33,11 +33,11 @@ public class ConfigBean {
     @Bean
     public Executor asyncWorker() {
             /** Set the ThreadPoolExecutor's core pool size. */
-            int corePoolSize = 5;
+            int corePoolSize = 10;
             /** Set the ThreadPoolExecutor's maximum pool size. */
-            int maxPoolSize = 5;
+            int maxPoolSize = 20;
             /** Set the capacity for the ThreadPoolExecutor's BlockingQueue. */
-            int queueCapacity = 2;
+            int queueCapacity = 5;
             ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
             executor.setCorePoolSize(corePoolSize);
             executor.setMaxPoolSize(maxPoolSize);

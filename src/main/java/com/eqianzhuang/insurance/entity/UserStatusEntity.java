@@ -1,4 +1,4 @@
-package com.eqianzhuang.efinancial.entity;
+package com.eqianzhuang.insurance.entity;
 
 import com.alibaba.fastjson.JSONObject;
 

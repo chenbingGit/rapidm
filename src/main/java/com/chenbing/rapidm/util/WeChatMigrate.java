@@ -37,10 +37,8 @@ public class WeChatMigrate {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
-
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -48,6 +46,13 @@ public class WeChatMigrate {
     @Autowired
     private HttpUtil httpUtil;
 
+
+    //迁移mysql数据
+    @Async("asyncWorker")
+    public void mysqlMigrate(int min ,int  max) {
+        int row = jdbcTemplate.update("UPDATE credit_cpa.v3_weixin_openid_temporary_xyb2 b  LEFT JOIN credit_agency.v2_chat_log a ON a.openId = b.oldOpenId SET a.openId = b.newOpenId WHERE b.id > ? and b.id < ?;", min,max);
+        logger.info("替换" + row +"行,id="+min);
+    }
 
     //迁移mongo数据
     @Async("asyncWorker")
@@ -70,7 +75,7 @@ public class WeChatMigrate {
     @Async("asyncWorker")
     public void redisMigrate(String ori_openid,String redisKeyPrefix) {
         try {
-            String new_openid = jdbcTemplate.queryForObject("SELECT t.newOpenId FROM credit_cpa.v3_weixin_openid_temporary2 t WHERE oldOpenId =  ? ;" ,String.class,ori_openid);
+            String new_openid = jdbcTemplate.queryForObject("SELECT t.newOpenId FROM credit_cpa.v3_weixin_openid_temporary_xyr2 t WHERE oldOpenId =  ? ;" ,String.class,ori_openid);
             logger.info(ori_openid+","+new_openid);
             redisTemplate.rename(redisKeyPrefix +ori_openid, redisKeyPrefix +new_openid);
         }catch (EmptyResultDataAccessException e){
@@ -85,7 +90,7 @@ public class WeChatMigrate {
 
     @Async("asyncWorker")
     public void subscribeTest(){
-        httpUtil.postForObject("http://preweixin.eqianzhuang.com/efinancial/xmlMsgReceive","<xml>\n" +
+        httpUtil.postForObject("http://preweixin.eqianzhuang.com/insurance/xmlMsgReceive","<xml>\n" +
                 "\t<ToUserName><![CDATA[gh_e09334361044]]></ToUserName>\n" +
                 "\t<FromUserName><![CDATA[ozBTCt_6j-HbM3BzhqbP84-gg0go]]></FromUserName>\n" +
                 "\t<CreateTime>1517932879</CreateTime>\n" +
@@ -165,12 +170,17 @@ public class WeChatMigrate {
         private WeChatMigrate weChatMigrate;
 
         @Autowired
+        private RedisTemplate<String,String> redisTemplate;
+
+        @Autowired
         private JdbcTemplate jdbcTemplate;
+
+        protected Log logger= LogFactory.getLog(this.getClass());
 
         public void redisMigrateRun(){
 
             String redisKeyPrefix = "UserStatus_wxba7248accdeb1e56";
-            Set<String> keySet = redisTemplate.keys(redisKeyPrefix +"o0gjM0*");
+            Set<String> keySet = redisTemplate.keys(redisKeyPrefix +"o2QdT0*");
             logger.error( "keySet="+keySet.size());
             for (String key : keySet) {
                 String openid = key.substring( redisKeyPrefix.length(),key.length());
@@ -181,7 +191,7 @@ public class WeChatMigrate {
 
         public void mongoMigrateRun(){
             for (int i = 0;true; i++) {
-                List<Map<String, Object>> openidMapList = jdbcTemplate.queryForList("SELECT t.newOpenId ,t.oldOpenId FROM credit_cpa.v3_weixin_openid_temporary2 t LIMIT ?,1000;" , i*1000);
+                List<Map<String, Object>> openidMapList = jdbcTemplate.queryForList("SELECT t.newOpenId ,t.oldOpenId FROM credit_cpa.v3_weixin_openid_temporary_xyb2 t LIMIT ?,1000;" , i*1000);
                 for (Map<String, Object> openidMap:openidMapList) {
                     String ori_openid = (String) openidMap.get("oldOpenId");
                     String new_openid = (String) openidMap.get("newOpenId");
@@ -192,7 +202,20 @@ public class WeChatMigrate {
                     break;
                 }
             }
+
         }
 
+        public void mysqlMigrateRun(){
+            int headId = jdbcTemplate.queryForObject("SELECT id FROM credit_cpa.v3_weixin_openid_temporary_xyb2 ORDER BY id ASC LIMIT 1;" , Integer.class);
+            int tailId = jdbcTemplate.queryForObject("SELECT id FROM credit_cpa.v3_weixin_openid_temporary_xyb2 ORDER BY id DESC LIMIT 1;" , Integer.class);
+            while (true) {
+                weChatMigrate.mysqlMigrate( headId , headId + 100);
+                headId += 100;
+                if ( headId > tailId  ) {
+                    logger.info("替换结束");
+                    break;
+                }
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.chenbing.rapidm.dao;
 
 
-import com.eqianzhuang.efinancial.entity.UserStatusEntity;
+import com.eqianzhuang.insurance.entity.UserStatusEntity;
 
 public interface UserStatusDao {
     UserStatusEntity get(String openid);
